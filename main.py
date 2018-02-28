@@ -128,7 +128,7 @@ def SommaPerditePerNodi(b, cut, interf, inter_cut):
 
 #------------------------------------------------------------------------------
 
-    return L_HPop, L_LSAPop, L_HCut, L_LSACut, L_HInt, L_LSAInt, L_HIntCut, L_LSAIntCut
+    return abs(L_HPop), abs(L_LSAPop), abs(L_HCut), abs(L_LSACut), abs(L_HInt), abs(L_LSAInt), abs(L_HIntCut), abs(L_LSAIntCut)
 
 
 p = argparse.ArgumentParser()
@@ -151,12 +151,12 @@ if args.evluatioTest:
     if args.type:
         fil = open('waxman.dat', 'w')
         if args.type == "waxman":
-            dizWaxman = {60: 0.089, 100: 0.077, 150: 0.061, 200: 0.052}
+            dizWaxman = {60: 0.089, 100: 0.076, 150: 0.062, 200: 0.052, 250: 0.043}
             for diter in sorted(dizWaxman.iterkeys()):
                 L_HPop, L_LSAPop, L_HCut, L_LSACut, L_HInt, L_LSAInt, L_HIntCut, L_LSAIntCut = (
                     [] for i in range(8))
 
-                for i in range(2):
+                for i in range(5):
                     print diter
                     graph = GeneraGrafoRandom(kind=args.type, seed=args.seed,
                                               dim=diter, beta=dizWaxman[diter])
@@ -178,7 +178,7 @@ if args.evluatioTest:
                     L_LSAIntCut.append(LLSAIntCut)
                     print "------------------------------------------------------------"
 
-                nci = 2
+                nci = 5
                 print >> fil, diter, sum(L_HPop) / nci, sum(L_LSAPop) / nci, sum(L_HCut) / nci,\
                     sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci,\
                     sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci
