@@ -13,16 +13,16 @@ warnings.filterwarnings("ignore")
 graph_kind = set(["erdos", "waxman", "caveman"])
 
 
-def GeneraGrafoRandom(kind, seed=None, dim=60, beta=0.09):
+def GeneraGrafoRandom(kind, seed=None, dim=60, prob=0.09):
     if kind not in graph_kind:
         print "Unknown graph type"
         exit()
     if kind == "caveman":
         g = nx.relaxed_caveman_graph(8, 7, 0.12, seed=seed)
     if kind == "waxman":
-        g = nx.waxman_graph(dim, alpha=1.2, beta=beta)
+        g = nx.waxman_graph(dim, alpha=1.2, beta=prob)
     if kind == "erdos":
-        g = nx.gnp_random_graph(60, 0.08, seed=seed)
+        g = nx.gnp_random_graph(dim, p=prob, seed=seed)
 
     rapportoespansione = [False] * 75 + [True] * 25
     maxinterfacce = 8
@@ -149,39 +149,43 @@ if not args.type and not args.graph:
 
 if args.evluatioTest:
     if args.type:
-        fil = open('waxman.dat', 'w')
         if args.type == "waxman":
-            dizWaxman = {60: 0.089, 100: 0.076, 150: 0.062, 200: 0.052, 250: 0.043}
-            for diter in sorted(dizWaxman.iterkeys()):
-                L_HPop, L_LSAPop, L_HCut, L_LSACut, L_HInt, L_LSAInt, L_HIntCut, L_LSAIntCut = (
-                    [] for i in range(8))
+            fil = open('waxman.dat', 'w')
+            diz = {60: 0.089, 100: 0.076, 150: 0.062, 200: 0.052, 250: 0.043}
+        elif args.type == "erdos":
+            fil = open('erdos.dat', 'w')
+            diz = {60: 0.06, 100: 0.038, 150: 0.027, 200: 0.022, 250: 0.0175}
 
-                for i in range(5):
-                    print diter
-                    graph = GeneraGrafoRandom(kind=args.type, seed=args.seed,
-                                              dim=diter, beta=dizWaxman[diter])
-                    b = ComputeTheoreticalValues(graph=graph, cH=2, cTC=5)
-                    cut = ComputeTheoreticalValues(graph=graph, cH=2, cTC=5, cent="Cut-point")
-                    interf = ComputeTheoreticalValues(graph=graph, cH=2, cTC=5, cent="Interfacce")
-                    inter_cut = ComputeTheoreticalValues(graph=graph, cH=2, cTC=5, cent="Inter-cut")
+        for diter in sorted(diz.iterkeys()):
+            L_HPop, L_LSAPop, L_HCut, L_LSACut, L_HInt, L_LSAInt, L_HIntCut, L_LSAIntCut = (
+                [] for i in range(8))
 
-                    LHPop, LLSAPop, LHCut, LLSACut, LHInt, LLSAInt, LHIntCut, LLSAIntCut = SommaPerditePerNodi(
-                        b, cut, interf, inter_cut)
+            for i in range(5):
+                print diter
+                graph = GeneraGrafoRandom(kind=args.type, seed=args.seed,
+                                          dim=diter, prob=diz[diter])
+                b = ComputeTheoreticalValues(graph=graph, cH=2, cTC=5)
+                cut = ComputeTheoreticalValues(graph=graph, cH=2, cTC=5, cent="Cut-point")
+                interf = ComputeTheoreticalValues(graph=graph, cH=2, cTC=5, cent="Interfacce")
+                inter_cut = ComputeTheoreticalValues(graph=graph, cH=2, cTC=5, cent="Inter-cut")
 
-                    L_HPop.append(LHPop)
-                    L_LSAPop.append(LLSAPop)
-                    L_HCut.append(LHCut)
-                    L_LSACut.append(LLSACut)
-                    L_HInt.append(LHInt)
-                    L_LSAInt.append(LLSAInt)
-                    L_HIntCut.append(LHIntCut)
-                    L_LSAIntCut.append(LLSAIntCut)
-                    print "------------------------------------------------------------"
+                LHPop, LLSAPop, LHCut, LLSACut, LHInt, LLSAInt, LHIntCut, LLSAIntCut = SommaPerditePerNodi(
+                    b, cut, interf, inter_cut)
 
-                nci = 5
-                print >> fil, diter, sum(L_HPop) / nci, sum(L_LSAPop) / nci, sum(L_HCut) / nci,\
-                    sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci,\
-                    sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci
+                L_HPop.append(LHPop)
+                L_LSAPop.append(LLSAPop)
+                L_HCut.append(LHCut)
+                L_LSACut.append(LLSACut)
+                L_HInt.append(LHInt)
+                L_LSAInt.append(LLSAInt)
+                L_HIntCut.append(LHIntCut)
+                L_LSAIntCut.append(LLSAIntCut)
+                print "------------------------------------------------------------"
+
+            nci = 5
+            print >> fil, diter, sum(L_HPop) / nci, sum(L_LSAPop) / nci, sum(L_HCut) / nci,\
+                sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci,\
+                sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci
         fil.close()
         exit()
     else:
