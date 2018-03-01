@@ -25,7 +25,7 @@ def GeneraGrafoRandom(kind, seed=None, dim=60, prob=0.09):
     if kind == "waxman":
         g = nx.waxman_graph(dim, alpha=1.1, beta=prob)
     if kind == "erdos":
-        g = nx.gnp_random_graph(250, p=0.020, seed=seed)
+        g = nx.gnp_random_graph(dim, p=prob, seed=seed)
     if kind == "barabasi":
         g = nx.barabasi_albert_graph(dim, m=prob, seed=seed)
 
@@ -196,11 +196,20 @@ if args.evluatioTest:
             if args.type != "caveman":
                 print >> fil, diter, sum(L_HPop) / nci, sum(L_LSAPop) / nci, sum(L_HCut) / nci,\
                     sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci,\
-                    sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci
+                    sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci, \
+                    min(L_HPop), max(L_HPop), min(L_LSAPop), max(L_LSAPop), \
+                    min(L_HCut), max(L_HCut), min(L_LSACut), max(L_LSACut), \
+                    min(L_HInt), max(L_HInt), min(L_LSAInt), max(L_LSAInt), \
+                    min(L_HIntCut), max(L_HIntCut), min(L_LSAIntCut), max(L_LSAIntCut)
+
             else:
                 print >> fil, (diter * 10), sum(L_HPop) / nci, sum(L_LSAPop) / nci, \
                     sum(L_HCut) / nci, sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci, \
-                    sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci
+                    sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci, \
+                    min(L_HPop), max(L_HPop), min(L_LSAPop), max(L_LSAPop), \
+                    min(L_HCut), max(L_HCut), min(L_LSACut), max(L_LSACut), \
+                    min(L_HInt), max(L_HInt), min(L_LSAInt), max(L_LSAInt), \
+                    min(L_HIntCut), max(L_HIntCut), min(L_LSAIntCut), max(L_LSAIntCut)
         fil.close()
         exit()
     else:
