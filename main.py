@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import random
 import sys
 import warnings
+import numpy
 
 
 warnings.filterwarnings("ignore")
@@ -81,8 +82,8 @@ def SommaPerditePerNodi(b, cut, interf, inter_cut):
 
     L_HPop = 1.0 - (lossHPop / lossHNonPop)
     L_LSAPop = 1.0 - (lossLSAPop / lossLSANonPop)
-    print "Pop-Ruting:{ L_h= ", 1.0 - (lossHPop / lossHNonPop), ", L_LSA= ", \
-        1.0 - (lossLSAPop / lossLSANonPop), "}"
+    # print "Pop-Ruting:{ L_h= ", 1.0 - (lossHPop / lossHNonPop), ", L_LSA= ", \
+    #    1.0 - (lossLSAPop / lossLSANonPop), "}"
 
 #------------------------------------------------------------------------------
 
@@ -97,8 +98,8 @@ def SommaPerditePerNodi(b, cut, interf, inter_cut):
 
     L_HCut = 1.0 - (lossHCut / lossHNonCut)
     L_LSACut = 1.0 - (lossLSACut / lossLSANonCut)
-    print "Pop-R  cut:{ L_h= ", 1.0 - (lossHCut / lossHNonCut), ", L_LSA= ", \
-        1.0 - (lossLSACut / lossLSANonCut), "}"
+    # print "Pop-R  cut:{ L_h= ", 1.0 - (lossHCut / lossHNonCut), ", L_LSA= ", \
+    #    1.0 - (lossLSACut / lossLSANonCut), "}"
 
 #------------------------------------------------------------------------------
 
@@ -112,8 +113,8 @@ def SommaPerditePerNodi(b, cut, interf, inter_cut):
 
     L_HInt = 1.0 - (lossHInt / lossHNonInt)
     L_LSAInt = 1.0 - (lossLSAInt / lossLSANonInt)
-    print "Pop-R inter:{ L_h= ", 1.0 - (lossHInt / lossHNonInt), ", L_LSA= ", \
-        1.0 - (lossLSAInt / lossLSANonInt), "}"
+    # print "Pop-R inter:{ L_h= ", 1.0 - (lossHInt / lossHNonInt), ", L_LSA= ", \
+    #    1.0 - (lossLSAInt / lossLSANonInt), "}"
 
 #------------------------------------------------------------------------------
 
@@ -127,8 +128,8 @@ def SommaPerditePerNodi(b, cut, interf, inter_cut):
 
     L_HIntCut = 1.0 - (lossHIntCut / lossHNonIntCut)
     L_LSAIntCut = 1.0 - (lossLSAIntCut / lossLSANonIntCut)
-    print "Pop-R int+cut:{ L_h= ", 1.0 - (lossHIntCut / lossHNonIntCut),\
-        ", L_LSA= ", 1.0 - (lossLSAIntCut / lossLSANonIntCut), "}"
+    # print "Pop-R int+cut:{ L_h= ", 1.0 - (lossHIntCut / lossHNonIntCut),\
+    #    ", L_LSA= ", 1.0 - (lossLSAIntCut / lossLSANonIntCut), "}"
 
 #------------------------------------------------------------------------------
 
@@ -170,8 +171,8 @@ if args.evluatioTest:
             L_HPop, L_LSAPop, L_HCut, L_LSACut, L_HInt, L_LSAInt, L_HIntCut, L_LSAIntCut = (
                 [] for i in range(8))
 
-            for i in range(5):
-                print diter
+            print diter
+            for i in range(10):
                 graph = GeneraGrafoRandom(kind=args.type, seed=args.seed,
                                           dim=diter, prob=diz[diter])
                 b = ComputeTheoreticalValues(graph=graph, cH=2, cTC=5)
@@ -190,26 +191,36 @@ if args.evluatioTest:
                 L_LSAInt.append(LLSAInt)
                 L_HIntCut.append(LHIntCut)
                 L_LSAIntCut.append(LLSAIntCut)
-                print "------------------------------------------------------------"
+                # print "------------------------------------------------------------"
 
-            nci = 5
+            nci = 10
+            mhPop = sum(L_HPop) / nci
+            mlsaPop = sum(L_LSAPop) / nci
+            mhCut = sum(L_HCut) / nci
+            mlsaCut = sum(L_LSACut) / nci
+            mhInt = sum(L_HInt) / nci
+            mlsaInt = sum(L_LSAInt) / nci
+            mhIntCut = sum(L_HIntCut) / nci
+            mlsaIntCut = sum(L_LSAIntCut) / nci
+
+            sdHPop = numpy.std(L_HPop)
+            sdLSAPop = numpy.std(L_LSAPop)
+            sdHCut = numpy.std(L_HCut)
+            sdLSACut = numpy.std(L_LSACut)
+            sdHInt = numpy.std(L_HInt)
+            sdLSAInt = numpy.std(L_LSAInt)
+            sdHIntCut = numpy.std(L_HIntCut)
+            sdLSAIntCut = numpy.std(L_LSAIntCut)
+
             if args.type != "caveman":
-                print >> fil, diter, sum(L_HPop) / nci, sum(L_LSAPop) / nci, sum(L_HCut) / nci,\
-                    sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci,\
-                    sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci, \
-                    min(L_HPop), max(L_HPop), min(L_LSAPop), max(L_LSAPop), \
-                    min(L_HCut), max(L_HCut), min(L_LSACut), max(L_LSACut), \
-                    min(L_HInt), max(L_HInt), min(L_LSAInt), max(L_LSAInt), \
-                    min(L_HIntCut), max(L_HIntCut), min(L_LSAIntCut), max(L_LSAIntCut)
+                print >> fil, diter, mhPop, mlsaPop, mhCut, mlsaCut, mhInt, \
+                    mlsaInt, mhIntCut, mlsaIntCut, sdHPop, sdLSAPop, sdHCut, \
+                    sdLSACut, sdHInt, sdLSAInt, sdHIntCut,  sdLSAIntCut
 
             else:
-                print >> fil, (diter * 10), sum(L_HPop) / nci, sum(L_LSAPop) / nci, \
-                    sum(L_HCut) / nci, sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci, \
-                    sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci, \
-                    min(L_HPop), max(L_HPop), min(L_LSAPop), max(L_LSAPop), \
-                    min(L_HCut), max(L_HCut), min(L_LSACut), max(L_LSACut), \
-                    min(L_HInt), max(L_HInt), min(L_LSAInt), max(L_LSAInt), \
-                    min(L_HIntCut), max(L_HIntCut), min(L_LSAIntCut), max(L_LSAIntCut)
+                print >> fil, (diter * 10), mhPop, mlsaPop, mhCut, mlsaCut, mhInt, \
+                    mlsaInt, mhIntCut, mlsaIntCut, sdHPop, sdLSAPop, sdHCut, \
+                    sdLSACut, sdHInt, sdLSAInt, sdHIntCut,  sdLSAIntCut
         fil.close()
         exit()
     else:
