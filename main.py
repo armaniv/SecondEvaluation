@@ -10,7 +10,7 @@ import warnings
 
 
 warnings.filterwarnings("ignore")
-graph_kind = set(["erdos", "waxman", "caveman"])
+graph_kind = set(["erdos", "waxman", "caveman", "barabasi"])
 
 
 def GeneraGrafoRandom(kind, seed=None, dim=60, prob=0.09):
@@ -23,9 +23,11 @@ def GeneraGrafoRandom(kind, seed=None, dim=60, prob=0.09):
         else:
             g = nx.relaxed_caveman_graph(10, dim, p=prob, seed=seed)
     if kind == "waxman":
-        g = nx.waxman_graph(dim, alpha=1.2, beta=prob)
+        g = nx.waxman_graph(dim, alpha=1.1, beta=prob)
     if kind == "erdos":
-        g = nx.gnp_random_graph(dim, p=prob, seed=seed)
+        g = nx.gnp_random_graph(250, p=0.020, seed=seed)
+    if kind == "barabasi":
+        g = nx.barabasi_albert_graph(dim, m=prob, seed=seed)
 
     rapportoespansione = [False] * 75 + [True] * 25
     maxinterfacce = 8
@@ -77,10 +79,10 @@ def SommaPerditePerNodi(b, cut, interf, inter_cut):
         lossLSAPop += tc
         lossLSANonPop += tcnp
 
-    L_HPop = 1.0 - (lossHNonPop / lossHPop)
-    L_LSAPop = 1.0 - (lossLSANonPop / lossLSAPop)
-    print "Pop-Ruting:{ L_h= ", 1.0 - (lossHNonPop / lossHPop), ", L_LSA= ", \
-        1.0 - (lossLSANonPop / lossLSAPop), "}"
+    L_HPop = 1.0 - (lossHPop / lossHNonPop)
+    L_LSAPop = 1.0 - (lossLSAPop / lossLSANonPop)
+    print "Pop-Ruting:{ L_h= ", 1.0 - (lossHPop / lossHNonPop), ", L_LSA= ", \
+        1.0 - (lossLSAPop / lossLSANonPop), "}"
 
 #------------------------------------------------------------------------------
 
@@ -93,10 +95,10 @@ def SommaPerditePerNodi(b, cut, interf, inter_cut):
         lossLSACut += tc
         lossLSANonCut += tcnp
 
-    L_HCut = 1.0 - (lossHNonCut / lossHCut)
-    L_LSACut = 1.0 - (lossLSANonCut / lossLSACut)
-    print "Pop-R  cut:{ L_h= ", 1.0 - (lossHNonCut / lossHCut), ", L_LSA= ", \
-        1.0 - (lossLSANonCut / lossLSACut), "}"
+    L_HCut = 1.0 - (lossHCut / lossHNonCut)
+    L_LSACut = 1.0 - (lossLSACut / lossLSANonCut)
+    print "Pop-R  cut:{ L_h= ", 1.0 - (lossHCut / lossHNonCut), ", L_LSA= ", \
+        1.0 - (lossLSACut / lossLSANonCut), "}"
 
 #------------------------------------------------------------------------------
 
@@ -108,10 +110,10 @@ def SommaPerditePerNodi(b, cut, interf, inter_cut):
         lossLSAInt += tc
         lossLSANonInt += tcnp
 
-    L_HInt = 1.0 - (lossHNonInt / lossHInt)
-    L_LSAInt = 1.0 - (lossLSANonInt / lossLSAInt)
-    print "Pop-R inter:{ L_h= ", 1.0 - (lossHNonInt / lossHInt), ", L_LSA= ", \
-        1.0 - (lossLSANonInt / lossLSAInt), "}"
+    L_HInt = 1.0 - (lossHInt / lossHNonInt)
+    L_LSAInt = 1.0 - (lossLSAInt / lossLSANonInt)
+    print "Pop-R inter:{ L_h= ", 1.0 - (lossHInt / lossHNonInt), ", L_LSA= ", \
+        1.0 - (lossLSAInt / lossLSANonInt), "}"
 
 #------------------------------------------------------------------------------
 
@@ -123,14 +125,14 @@ def SommaPerditePerNodi(b, cut, interf, inter_cut):
         lossLSAIntCut += tc
         lossLSANonIntCut += tcnp
 
-    L_HIntCut = 1.0 - (lossHNonIntCut / lossHIntCut)
-    L_LSAIntCut = 1.0 - (lossLSANonIntCut / lossLSAIntCut)
-    print "Pop-R int+cut:{ L_h= ", 1.0 - (lossHNonIntCut / lossHIntCut),\
-        ", L_LSA= ", 1.0 - (lossLSANonIntCut / lossLSAIntCut), "}"
+    L_HIntCut = 1.0 - (lossHIntCut / lossHNonIntCut)
+    L_LSAIntCut = 1.0 - (lossLSAIntCut / lossLSANonIntCut)
+    print "Pop-R int+cut:{ L_h= ", 1.0 - (lossHIntCut / lossHNonIntCut),\
+        ", L_LSA= ", 1.0 - (lossLSAIntCut / lossLSANonIntCut), "}"
 
 #------------------------------------------------------------------------------
 
-    return abs(L_HPop), abs(L_LSAPop), abs(L_HCut), abs(L_LSACut), abs(L_HInt), abs(L_LSAInt), abs(L_HIntCut), abs(L_LSAIntCut)
+    return L_HPop, L_LSAPop, L_HCut, L_LSACut, L_HInt, L_LSAInt, L_HIntCut, L_LSAIntCut
 
 
 p = argparse.ArgumentParser()
@@ -153,13 +155,16 @@ if args.evluatioTest:
     if args.type:
         if args.type == "waxman":
             fil = open('waxman.dat', 'w')
-            diz = {60: 0.089, 100: 0.076, 150: 0.062, 200: 0.052, 250: 0.043}
+            diz = {60: 0.092, 100: 0.077, 150: 0.063, 200: 0.053, 250: 0.044}
         elif args.type == "erdos":
             fil = open('erdos.dat', 'w')
-            diz = {60: 0.07, 100: 0.042, 150: 0.0305, 200: 0.024, 250: 0.019}
+            diz = {60: 0.069, 100: 0.042, 150: 0.031, 200: 0.0247, 250: 0.020}
         elif args.type == "caveman":
             fil = open('caveman.dat', 'w')
             diz = {6: 0.05, 10: 0.05, 15: 0.05, 20: 0.01, 25: 0.0082}
+        elif args.type == "barabasi":
+            fil = open('barabasi.dat', 'w')
+            diz = {60: 3, 100: 3, 150: 2, 200: 2, 250: 2}
 
         for diter in sorted(diz.iterkeys()):
             L_HPop, L_LSAPop, L_HCut, L_LSACut, L_HInt, L_LSAInt, L_HIntCut, L_LSAIntCut = (
@@ -193,8 +198,8 @@ if args.evluatioTest:
                     sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci,\
                     sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci
             else:
-                print >> fil, (diter * 10), sum(L_HPop) / nci, sum(L_LSAPop) / nci, sum(L_HCut) / nci,\
-                    sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci,\
+                print >> fil, (diter * 10), sum(L_HPop) / nci, sum(L_LSAPop) / nci, \
+                    sum(L_HCut) / nci, sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci, \
                     sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci
         fil.close()
         exit()
