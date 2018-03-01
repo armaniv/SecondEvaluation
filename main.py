@@ -18,7 +18,10 @@ def GeneraGrafoRandom(kind, seed=None, dim=60, prob=0.09):
         print "Unknown graph type"
         exit()
     if kind == "caveman":
-        g = nx.relaxed_caveman_graph(8, 7, 0.12, seed=seed)
+        if dim <= 15:
+            g = nx.relaxed_caveman_graph(dim, 10, p=prob, seed=seed)
+        else:
+            g = nx.relaxed_caveman_graph(10, dim, p=prob, seed=seed)
     if kind == "waxman":
         g = nx.waxman_graph(dim, alpha=1.2, beta=prob)
     if kind == "erdos":
@@ -49,8 +52,7 @@ def GeneraGrafoRandom(kind, seed=None, dim=60, prob=0.09):
         i += 1
 
     if nx.is_connected(g) == False:
-        print "Graph not connected, exit."
-        exit()
+        g = GeneraGrafoRandom(kind=kind, seed=seed, dim=dim, prob=prob)
 
     mapping = {}
     for x in g.nodes():
@@ -154,7 +156,10 @@ if args.evluatioTest:
             diz = {60: 0.089, 100: 0.076, 150: 0.062, 200: 0.052, 250: 0.043}
         elif args.type == "erdos":
             fil = open('erdos.dat', 'w')
-            diz = {60: 0.06, 100: 0.038, 150: 0.027, 200: 0.022, 250: 0.0175}
+            diz = {60: 0.07, 100: 0.042, 150: 0.0305, 200: 0.024, 250: 0.019}
+        elif args.type == "caveman":
+            fil = open('caveman.dat', 'w')
+            diz = {6: 0.05, 10: 0.05, 15: 0.05, 20: 0.01, 25: 0.0082}
 
         for diter in sorted(diz.iterkeys()):
             L_HPop, L_LSAPop, L_HCut, L_LSACut, L_HInt, L_LSAInt, L_HIntCut, L_LSAIntCut = (
@@ -183,9 +188,14 @@ if args.evluatioTest:
                 print "------------------------------------------------------------"
 
             nci = 5
-            print >> fil, diter, sum(L_HPop) / nci, sum(L_LSAPop) / nci, sum(L_HCut) / nci,\
-                sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci,\
-                sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci
+            if args.type != "caveman":
+                print >> fil, diter, sum(L_HPop) / nci, sum(L_LSAPop) / nci, sum(L_HCut) / nci,\
+                    sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci,\
+                    sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci
+            else:
+                print >> fil, (diter * 10), sum(L_HPop) / nci, sum(L_LSAPop) / nci, sum(L_HCut) / nci,\
+                    sum(L_LSACut) / nci, sum(L_HInt) / nci, sum(L_LSAInt) / nci,\
+                    sum(L_HIntCut) / nci, sum(L_LSAIntCut) / nci
         fil.close()
         exit()
     else:
