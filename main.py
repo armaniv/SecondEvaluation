@@ -24,7 +24,7 @@ def GeneraGrafoRandom(kind, seed=None, dim=60, prob=0.09):
         else:
             g = nx.relaxed_caveman_graph(10, dim, p=prob, seed=seed)
     if kind == "waxman":
-        g = nx.waxman_graph(dim, alpha=1.1, beta=prob)
+        g = nx.waxman_graph(dim, alpha=1.05, beta=prob)
     if kind == "erdos":
         g = nx.gnp_random_graph(dim, p=prob, seed=seed)
     if kind == "barabasi":
@@ -156,13 +156,13 @@ if args.evluatioTest:
     if args.type:
         if args.type == "waxman":
             fil = open('waxman.dat', 'w')
-            diz = {60: 0.092, 100: 0.077, 150: 0.063, 200: 0.053, 250: 0.044}
+            diz = {60: 0.096, 100: 0.077, 150: 0.063, 200: 0.053, 250: 0.044}
         elif args.type == "erdos":
             fil = open('erdos.dat', 'w')
             diz = {60: 0.069, 100: 0.042, 150: 0.031, 200: 0.0247, 250: 0.020}
         elif args.type == "caveman":
             fil = open('caveman.dat', 'w')
-            diz = {6: 0.05, 10: 0.05, 15: 0.05, 20: 0.01, 25: 0.0082}
+            diz = {6: 0.05, 10: 0.05, 15: 0.05, 20: 0.01, 25: 0.005}
         elif args.type == "barabasi":
             fil = open('barabasi.dat', 'w')
             diz = {60: 3, 100: 3, 150: 2, 200: 2, 250: 2}
